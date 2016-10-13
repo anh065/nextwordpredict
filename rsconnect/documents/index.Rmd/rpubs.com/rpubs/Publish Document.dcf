@@ -1,0 +1,7 @@
+name: Publish Document
+account: rpubs
+server: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/218340/d23a7fd6a9504f97b721dac3263797ea
+bundleId: https://api.rpubs.com/api/v1/document/218340/d23a7fd6a9504f97b721dac3263797ea
+url: http://rpubs.com/anh065/218340
+when: 1476375965.7259

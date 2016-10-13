@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <meta name="author" content="Anh Bui">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1></h1>
+    <h2>Next word prediction with n-gram language model</h2>
+    <p>Anh Bui<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <article data-timings="">
+    <style>
+em {
+  font-style: italic
+}
+
+strong {
+  font-weight: bold;
+}
+
+sup {
+  top: -0.5em;
+  vertical-align: baseline;
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+}
+</style>
+
+<!-- Center image on slide -->
+
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+
+<script type='text/javascript'>
+$(function() {
+    $("p:has(img)").addClass('centered');
+});
+</script>
+
+<h2>A Brief Description</h2>
+
+<ul>
+<li><p>A n-gram language model is developed for next word prediction which is purposed to be used as a smart keyboard input for mobile devices.</p></li>
+<li><p>A large corpus of text documents (news, blogs, twitts) is analyzed to discover the structure in the data  to support the construction of the model. The R packages used for preliminary text processing include: <em>tm</em>, <em>quanteda</em>, <em>data.table</em>, etc.</p></li>
+<li><p>The techniques of text mining and natural language processing, e.g. Stupid Backoff and Interpolated Kneser-Ney smoothing algorithms, are employed.</p></li>
+<li><p>The model is implemented in a Shiny App that allows online interactive next word prediction.</p></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Preliminary Data Processing</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li><p>The <em>news</em>, <em>blogs</em>, and <em>twitts</em> databases are found to contain huge numbers of text lines (1,010,242, 899,288,
+and 2,360,148, respectively), which include words, numbers, symbols, emoticons, etc. The <em>twitts</em> data are particularly rich in symbols, special characters, and emoticons, which need to be removed during the preliminary data processing</p></li>
+<li><p>R packages <em>tm</em> and <em>quanteda</em> are used to:</p>
+
+<ul>
+<li>break the text lines into sentences</li>
+<li>clean the text corpus of numbers, symbols, emoticons, puntuations, URLs, etc.</li>
+<li>tokenize the text and construct of n-gram (n from 1 to 5) data tables</li>
+</ul></li>
+<li><p>All the corpus of text data is processed part by part. The created n-grams are pruned (removing any n-gram with a count less than 4) and written to files for later use in the Shiny App</p></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>N-grams For Next-Word Prediction</h2>
+  </hgroup>
+  <article data-timings="">
+    <table><thead>
+<tr>
+<th>n-gram</th>
+<th>number of n-grams</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>1</td>
+<td>109,769</td>
+</tr>
+<tr>
+<td>2</td>
+<td>787,960</td>
+</tr>
+<tr>
+<td>3</td>
+<td>836,358</td>
+</tr>
+<tr>
+<td>4</td>
+<td>361,461</td>
+</tr>
+<tr>
+<td>5</td>
+<td>100,047</td>
+</tr>
+</tbody></table>
+
+<p>The n-grams are tokenized and stored as data tables (R data.table) to facilitate faster search and manipulation</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>Next Word Prediction Model</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Stupid Backoff is easy to be implemented and suitable for large-scale language models - if a higher-order n-gram search results in zero count, the search is simply backoffed to a lower order n-gram. A score together with a weight (\(\lambda\) , depending on the n-gram order) is used instead of probability in the search for the next word</li>
+</ul>
+
+<p><img src="figures/SBscore.png" alt=""></p>
+
+<ul>
+<li>Kneser-Ney algorithm is one of the most commonly used and best performing n-gram smoothing methods. Kneser-Ney algorithm allows the use of <em>context</em> in defining the most probable next work. Kneser-Ney algorithm is slower than Stupid Backoff as recursive calculation over n-grams of different orders is required</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-5" style="background:;">
+  <hgroup>
+    <h2>Shiny App</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li><p>The model is implemented in a Shiny App that allows interactive next word search</p></li>
+<li><p>ui.R realizes an user interface with input/output, controls, and description, including</p>
+
+<ul>
+<li>A text box for text input by the user </li>
+<li>A table displaying the results of next word predictions with score/probability and used n-gram(s)</li>
+</ul></li>
+<li><p>server.R contains the code which performs the following tasks</p>
+
+<ul>
+<li>Reading in n-gram data table from files</li>
+<li>Processing text input by the user</li>
+<li>Conducting search and computation of score or probability of possible next word candidates</li>
+</ul></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-6" style="background:;">
+  <hgroup>
+    <h2>Screen Capture of the Shiny App Run</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="figures/shinyapp.png" alt=""></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='NA'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Preliminary Data Processing'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='N-grams For Next-Word Prediction'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Next Word Prediction Model'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='Shiny App'>
+         5
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=6 title='Screen Capture of the Shiny App Run'>
+         6
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <!-- <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script> -->
+  <script>window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="libraries/widgets/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"><\/script>')
+</script>
+<!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
